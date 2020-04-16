@@ -1,0 +1,43 @@
+From 5e677cf054ae442e42439d5dcf10df64b98107b1 Mon Sep 17 00:00:00 2001
+From: Hin-Tak Leung <htl10@users.sourceforge.net>
+Date: Sun, 12 Apr 2020 00:00:28 +0100
+Subject: [PATCH 6/6] protect with HOST_DARWIN
+
+Signed-off-by: Hin-Tak Leung <htl10@users.sourceforge.net>
+---
+ mono/mini/main.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/mono/mini/main.c b/mono/mini/main.c
+index 8a90f4ecf..ce5cf4bfa 100644
+--- a/mono/mini/main.c
++++ b/mono/mini/main.c
+@@ -36,7 +36,9 @@
+ #    include "buildver-boehm.h"
+ #  endif
+ #endif
++#ifdef HOST_DARWIN
+ #include <mach-o/loader.h>
++#endif
+ 
+ /*
+  * If the MONO_ENV_OPTIONS environment variable is set, it uses this as a
+@@ -273,6 +275,7 @@ probe_embedded (const char *program, int *ref_argc, char **ref_argv [])
+ 		goto found;
+ 	else
+ 	{
++#ifdef HOST_DARWIN
+ 		struct mach_header_64 h;
+ 		if ((sigstart = lseek (fd, 0, SEEK_SET)) == -1)
+ 			goto doclose;
+@@ -308,6 +311,7 @@ probe_embedded (const char *program, int *ref_argc, char **ref_argv [])
+ 			count--;
+ 		}
+ 		goto doclose;
++#endif
+ 	}
+ found:
+ 	directory_location = GUINT64_FROM_LE ((*(uint64_t *) &sigbuffer [0]));
+-- 
+2.25.2
+

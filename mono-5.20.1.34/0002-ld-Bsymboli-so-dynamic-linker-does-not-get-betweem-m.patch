@@ -1,0 +1,36 @@
+From 039c98b203e9a16647af26c1de3d87660e7633ba Mon Sep 17 00:00:00 2001
+From: Jay Krell <jay.krell@cornell.edu>
+Date: Thu, 2 May 2019 23:29:57 -0700
+Subject: [PATCH 2/6] ld -Bsymboli so dynamic linker does not get betweem mono
+ and itself. (#14298)
+
+Signed-off-by: Hin-Tak Leung <htl10@users.sourceforge.net>
+---
+ configure.ac | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 4b5fc30a1..c90b8a82c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -4589,14 +4589,15 @@ AC_SEARCH_LIBS(dlopen, dl)
+ old_ldflags="${LDFLAGS}"
+ # GNU specific option, this confuses IBM ld, but do offer alternatives when possible
+ if test $lt_cv_prog_gnu_ld = yes; then
+-	LDFLAGS="${LDFLAGS} -Wl,-export-dynamic"
++	LDFLAGS="${LDFLAGS} -Wl,-export-dynamic,-Bsymbolic"
+ else
+ 	case $host in
+ 	*-*-aix*|*-*-os400*)
++		LDFLAGS="${LDFLAGS} -bsymbolic"
+ 		;;
+ 	*)
+ 		dnl Try to use export-dynamic anyways
+-		LDFLAGS="${LDFLAGS} -Wl,-export-dynamic"
++		LDFLAGS="${LDFLAGS} -Wl,-export-dynamic,-Bsymbolic"
+ 		;;
+ 	esac
+ fi
+-- 
+2.25.2
+

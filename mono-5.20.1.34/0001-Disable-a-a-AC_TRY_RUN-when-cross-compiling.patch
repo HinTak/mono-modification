@@ -1,0 +1,59 @@
+From 272c42f12d5fc04bec192abe4ab503cfa993fda9 Mon Sep 17 00:00:00 2001
+From: Zoltan Varga <vargaz@gmail.com>
+Date: Tue, 25 Jun 2019 16:03:38 -0400
+Subject: [PATCH 1/6] Disable a a AC_TRY_RUN when cross-compiling.
+
+Signed-off-by: Hin-Tak Leung <htl10@users.sourceforge.net>
+---
+ configure.ac | 33 +++++++++++++++++++--------------
+ 1 file changed, 19 insertions(+), 14 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index b34a68fa7..4b5fc30a1 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1864,22 +1864,27 @@ if test x$host_win32 = xno; then
+ 		LIBS="$LIBS $DL_LIB"
+ 		AC_DEFINE(HAVE_DL_LOADER,1,[dlopen-based dynamic loader available])
+ 		dnl from glib's configure.ac
+-		AC_CACHE_CHECK([for preceeding underscore in symbols],
+-			mono_cv_uscore,[
+-			AC_TRY_RUN([#include <dlfcn.h>
+-			int mono_underscore_test (void) { return 42; }
+-			int main() {
+-			  void *f1 = (void*)0, *f2 = (void*)0, *handle;
+-			  handle = dlopen ((void*)0, 0);
+-			  if (handle) {
+-			    f1 = dlsym (handle, "mono_underscore_test");
+-			    f2 = dlsym (handle, "_mono_underscore_test");
+-			  } return (!f2 || f1);
+-			}],
++		if test "x$cross_compiling" = "xyes"; then
++		   AC_MSG_RESULT(cross compiling, assuming no)
++		   mono_cv_uscore=no
++		else
++			AC_CACHE_CHECK([for preceeding underscore in symbols],
++			  mono_cv_uscore,[
++			  AC_TRY_RUN([#include <dlfcn.h>
++			  int mono_underscore_test (void) { return 42; }
++			  int main() {
++			    void *f1 = (void*)0, *f2 = (void*)0, *handle;
++			    handle = dlopen ((void*)0, 0);
++			    if (handle) {
++			      f1 = dlsym (handle, "mono_underscore_test");
++			      f2 = dlsym (handle, "_mono_underscore_test");
++			    } return (!f2 || f1);
++			  }],
+ 				[mono_cv_uscore=yes],
+ 				[mono_cv_uscore=no],
+-			[])
+-		])
++			  [])
++		  ])
++		fi
+ 		if test "x$mono_cv_uscore" = "xyes"; then
+ 			MONO_DL_NEED_USCORE=1
+ 		else
+-- 
+2.25.2
+

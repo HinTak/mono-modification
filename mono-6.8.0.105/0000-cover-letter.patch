@@ -1,0 +1,17 @@
+From e7e675ad47b3d436daef20198b43145052a27e5c Mon Sep 17 00:00:00 2001
+From: Hin-Tak Leung <htl10@users.sourceforge.net>
+Date: Thu, 16 Apr 2020 19:45:12 +0100
+Subject: [PATCH 0/2] *** SUBJECT HERE ***
+
+*** BLURB HERE ***
+
+Hin-Tak Leung (2):
+  apply mono-mini-main-codesign.diff
+  protect with HOST_DARWIN
+
+ mono/mini/main.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 45 insertions(+), 1 deletion(-)
+
+-- 
+2.25.2
+

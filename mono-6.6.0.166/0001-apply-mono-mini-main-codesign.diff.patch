@@ -1,0 +1,74 @@
+From 86593694c964c9305aa3cbc1978119d90a797b1a Mon Sep 17 00:00:00 2001
+From: Hin-Tak Leung <htl10@users.sourceforge.net>
+Date: Sat, 11 Apr 2020 23:57:08 +0100
+Subject: [PATCH 1/2] apply mono-mini-main-codesign.diff
+
+Signed-off-by: Hin-Tak Leung <htl10@users.sourceforge.net>
+---
+ mono/mini/main.c | 42 +++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 41 insertions(+), 1 deletion(-)
+
+diff --git a/mono/mini/main.c b/mono/mini/main.c
+index 5cf31ee0f..972652b4e 100644
+--- a/mono/mini/main.c
++++ b/mono/mini/main.c
+@@ -36,6 +36,7 @@
+ #    include "buildver-boehm.h"
+ #  endif
+ #endif
++#include <mach-o/loader.h>
+ 
+ //#define TEST_ICALL_SYMBOL_MAP 1
+ 
+@@ -274,8 +275,47 @@ probe_embedded (const char *program, int *ref_argc, char **ref_argv [])
+ 		goto doclose;
+ 	if (read (fd, sigbuffer, sizeof (sigbuffer)) == -1)
+ 		goto doclose;
+-	if (memcmp (sigbuffer+sizeof(uint64_t), "xmonkeysloveplay", 16) != 0)
++	if (memcmp (sigbuffer+sizeof(uint64_t), "xmonkeysloveplay", 16) == 0)
++		goto found;
++	else
++	{
++		struct mach_header_64 h;
++		if ((sigstart = lseek (fd, 0, SEEK_SET)) == -1)
++			goto doclose;
++		if (read (fd, &h, sizeof (h)) == -1)
++			goto doclose;
++		if (h.magic != MH_MAGIC_64)
++			goto doclose;
++
++		off_t total = h.sizeofcmds;
++		uint32_t count = h.ncmds;
++		while (total > 0 && count >0) {
++			struct load_command lc;
++			if (read (fd, &lc, sizeof (lc)) == -1)
++				goto doclose;
++			off_t sig_stored = lseek (fd, 0, SEEK_CUR);
++			if (lc.cmd == LC_SYMTAB) {
++				struct symtab_command stc;
++				if ((sigstart = lseek (fd, -sizeof (lc), SEEK_CUR)) == -1)
++					goto doclose;
++				if (read (fd, &stc, sizeof (stc)) == -1)
++					goto doclose;
++
++				if ((sigstart = lseek (fd, -(16+sizeof(uint64_t))+stc.stroff + stc.strsize, SEEK_SET)) == -1)
++					goto doclose;
++				if (read (fd, sigbuffer, sizeof (sigbuffer)) == -1)
++					goto doclose;
++				if (memcmp (sigbuffer+sizeof(uint64_t), "xmonkeysloveplay", 16) == 0)
++					goto found;
++			}
++			if ((sigstart = lseek (fd, sig_stored + lc.cmdsize-sizeof (lc), SEEK_SET)) == -1)
++				goto doclose;
++			total -= sizeof (lc.cmdsize);
++			count--;
++		}
+ 		goto doclose;
++	}
++found:
+ 	directory_location = GUINT64_FROM_LE ((*(uint64_t *) &sigbuffer [0]));
+ 	if (lseek (fd, directory_location, SEEK_SET) == -1)
+ 		goto doclose;
+-- 
+2.25.2
+

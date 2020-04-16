@@ -1,0 +1,35 @@
+From 5e677cf054ae442e42439d5dcf10df64b98107b1 Mon Sep 17 00:00:00 2001
+From: Hin-Tak Leung <htl10@users.sourceforge.net>
+Date: Thu, 16 Apr 2020 19:44:28 +0100
+Subject: [PATCH 0/6] *** SUBJECT HERE ***
+
+*** BLURB HERE ***
+
+Hin-Tak Leung (2):
+  apply mono-mini-main-codesign.diff
+  protect with HOST_DARWIN
+
+Jay Krell (3):
+  ld -Bsymboli so dynamic linker does not get betweem mono and itself.
+    (#14298)
+  Link with -z now or -bind_at_load. (#14562)
+  ld configure: Add another dash to export-dynamic. (#15717)
+
+Zoltan Varga (1):
+  Disable a a AC_TRY_RUN when cross-compiling.
+
+ configure.ac               | 57 +++++++++++++----------------
+ m4/ax_append_flag.m4       | 71 ++++++++++++++++++++++++++++++++++++
+ m4/ax_append_link_flags.m4 | 65 +++++++++++++++++++++++++++++++++
+ m4/ax_check_link_flag.m4   | 74 ++++++++++++++++++++++++++++++++++++++
+ m4/ax_require_defined.m4   | 37 +++++++++++++++++++
+ mono/mini/main.c           | 46 +++++++++++++++++++++++-
+ 6 files changed, 317 insertions(+), 33 deletions(-)
+ create mode 100644 m4/ax_append_flag.m4
+ create mode 100644 m4/ax_append_link_flags.m4
+ create mode 100644 m4/ax_check_link_flag.m4
+ create mode 100644 m4/ax_require_defined.m4
+
+-- 
+2.25.2
+

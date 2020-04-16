@@ -1,0 +1,43 @@
+From e7e675ad47b3d436daef20198b43145052a27e5c Mon Sep 17 00:00:00 2001
+From: Hin-Tak Leung <htl10@users.sourceforge.net>
+Date: Sun, 12 Apr 2020 00:00:28 +0100
+Subject: [PATCH 2/2] protect with HOST_DARWIN
+
+Signed-off-by: Hin-Tak Leung <htl10@users.sourceforge.net>
+---
+ mono/mini/main.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/mono/mini/main.c b/mono/mini/main.c
+index 7bacdb12b..e9efea6c1 100644
+--- a/mono/mini/main.c
++++ b/mono/mini/main.c
+@@ -36,7 +36,9 @@
+ #    include "buildver-boehm.h"
+ #  endif
+ #endif
++#ifdef HOST_DARWIN
+ #include <mach-o/loader.h>
++#endif
+ 
+ //#define TEST_ICALL_SYMBOL_MAP 1
+ 
+@@ -279,6 +281,7 @@ probe_embedded (const char *program, int *ref_argc, char **ref_argv [])
+ 		goto found;
+ 	else
+ 	{
++#ifdef HOST_DARWIN
+ 		struct mach_header_64 h;
+ 		if ((sigstart = lseek (fd, 0, SEEK_SET)) == -1)
+ 			goto doclose;
+@@ -314,6 +317,7 @@ probe_embedded (const char *program, int *ref_argc, char **ref_argv [])
+ 			count--;
+ 		}
+ 		goto doclose;
++#endif
+ 	}
+ found:
+ 	directory_location = GUINT64_FROM_LE ((*(uint64_t *) &sigbuffer [0]));
+-- 
+2.25.2
+

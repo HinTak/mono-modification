@@ -1,0 +1,31 @@
+From 17e6a9a9060e7a8490f7f3423787055fece25899 Mon Sep 17 00:00:00 2001
+From: Jay Krell <jaykrell@microsoft.com>
+Date: Wed, 24 Jul 2019 16:02:46 -0700
+Subject: [PATCH 4/6] ld configure: Add another dash to export-dynamic.
+ (#15717)
+
+GNU ld accept single or double dash, means the same thing.
+AIX ld warns on single dash, errors on double dash, in autoconf, and then errors on single dash later.
+We want the double dash so autoconf rejects it on AIX.
+
+Signed-off-by: Hin-Tak Leung <htl10@users.sourceforge.net>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 5f17e1a9e..e3f57556a 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -4591,7 +4591,7 @@ AC_SEARCH_LIBS(dlopen, dl)
+ # Apple -bind_at_load
+ # The rest GNU.
+ #
+-AX_APPEND_LINK_FLAGS([-Wl,-export-dynamic -Wl,-Bsymbolic -bsymbolic -Wl,-z,now -Wl,-bind_at_load])
++AX_APPEND_LINK_FLAGS([-Wl,--export-dynamic -Wl,-Bsymbolic -bsymbolic -Wl,-z,now -Wl,-bind_at_load])
+ 
+ AC_CHECK_HEADERS(getopt.h sys/select.h sys/time.h sys/wait.h pwd.h iconv.h sys/types.h sys/resource.h)
+ dnl giconv.c will check on HAVE_ICONV_H but we need this for link time
+-- 
+2.25.2
+

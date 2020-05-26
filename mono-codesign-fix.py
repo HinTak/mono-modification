@@ -46,10 +46,12 @@ for h in exe_data.headers:
     # The 4th (last) 'LC_SEGMENT_64' is the __LINKEDIT segment.
     linkedit = h.commands[3]
     print("4th(LC_SEGMENT_64/__LINKEDIT):\n\t", linkedit[0].get_cmd_name(), linkedit[1], linkedit[2])
-    print(file_size, linkedit[1].fileoff + linkedit[1].filesize, ((linkedit[1].vmsize - linkedit[1].filesize) == 0))
-    if (file_size != linkedit[1].fileoff + linkedit[1].filesize and (not multi_arch)):
-        linkedit[1].filesize = file_size - linkedit[1].fileoff
-        linkedit[1].vmsize = linkedit[1].filesize
+    # check that it is an executable, instead of e.g. dylib
+    if (linkedit[0].get_cmd_name() == 'LC_SEGMENT_64'):
+        print(file_size, linkedit[1].fileoff + linkedit[1].filesize, ((linkedit[1].vmsize - linkedit[1].filesize) == 0))
+        if (file_size != linkedit[1].fileoff + linkedit[1].filesize and (not multi_arch)):
+            linkedit[1].filesize = file_size - linkedit[1].fileoff
+            linkedit[1].vmsize = linkedit[1].filesize
 
 if (signed_binary or multi_arch):
     print("The binary was signed or multi_arch. Not modifying.")

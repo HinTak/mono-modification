@@ -44,7 +44,9 @@ for h in exe_data.headers:
             print("entry(LC_CODE_SIGNATURE):\n\t", c[0].get_cmd_name(), c[1], c[2])
             signed_binary = True
     # The 4th (last) 'LC_SEGMENT_64' is the __LINKEDIT segment.
-    linkedit = h.commands[3]
+    linkedit = [c for c in h.commands if \
+        hasattr(c[1], 'segname') and \
+        str(c[1].segname).startswith("b'__LINKEDIT")][0]
     print("4th(LC_SEGMENT_64/__LINKEDIT):\n\t", linkedit[0].get_cmd_name(), linkedit[1], linkedit[2])
     # check that it is an executable, instead of e.g. dylib
     if (linkedit[0].get_cmd_name() == 'LC_SEGMENT_64'):

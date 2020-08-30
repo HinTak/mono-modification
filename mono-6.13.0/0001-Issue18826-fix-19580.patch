@@ -1,0 +1,175 @@
+From b1b58ccc0d4fa09bf04b2996205c7f8e3e6f7b9e Mon Sep 17 00:00:00 2001
+From: HinTak <htl10@users.sourceforge.net>
+Date: Thu, 27 Aug 2020 16:38:38 +0100
+Subject: [PATCH] Issue18826 fix (#19580)
+
+* Look for "xmonkeysloveplay" also at the end of LC_SYMTAB section, for signed Mac OS X binaries
+
+This extends Miguel de Icaza's previous work on allowing mono to load embedded
+assemblies / shared libraries, which was in turn a workaround on recent
+Mac OS X's increased security (and stopping LD_LIBRARY_PATH and friends from
+working). Miguel de Icaza came up with the idea of appending all of those
+embedded assemblies / shared libraries to the end of mono's main executable,
+and getting it to look at its own file and unpacking resources from an offset
+number + "xmonkeysloveplay" written to the end of file.
+
+Even more recent Mac OS X starts to prefer /require binaries to be code-signed.
+Code signing appends a "LC_CODE_SIGNATURE" section to the binary, thus breaking
+mono's embedded resource-loading. Also code-signing requires that the binary
+has no unknown parts.
+
+To make mkbundle / mono embedded resource-loading work in a code-signing
+situation, two parts are required:
+
+- adjust mkbundle to extend the LC_SYMTAB section to cover the appended
+assemblies / shared libraries, so code-signing can happen.
+( addresses https://github.com/mono/mono/issues/17881 )
+
+- adjust mono's main executable to also look at the end of the LC_SYMTAB
+section for the magic offset +  "xmonkeysloveplay" token to find the embedded
+resources.
+( addresses https://github.com/mono/mono/issues/18826 )
+
+This change addresses the 2nd of the above. I also tried looking for the
+presence and beginnig of the LC_CODE_SIGNATURE section, but that proves
+unreliable: Code-signing can pad a few null bytes after "xmonkeysloveplay"
+to align the LC_CODE_SIGNATURE section to an 8(?)-byte boundary.
+
+* saving offset before read, so later lseek does not need to backtrack on the read
+
+This is a small simplification of the previous commit on this part of code.
+
+* fixes wrong drop-through from mis-positioning of #endif
+
+* Update mono/mini/main.c
+
+Adding spaces for clarity
+
+Co-authored-by: Ryan Lucia <ryan@luciaonline.net>
+
+* Update mono/mini/main.c
+
+Adding spaces for clarity
+
+Co-authored-by: Ryan Lucia <ryan@luciaonline.net>
+
+* Update mono/mini/main.c
+
+Adding spaces for clarity
+
+Co-authored-by: Ryan Lucia <ryan@luciaonline.net>
+
+* Update mono/mini/main.c
+
+Adding spaces for clarity
+
+Co-authored-by: Ryan Lucia <ryan@luciaonline.net>
+
+* Update mono/mini/main.c
+
+Added comment about what's going on.
+
+Co-authored-by: Ryan Lucia <ryan@luciaonline.net>
+
+* Adding comments for clarity
+
+* rename variable "h" to "bin_header", for clarity
+
+* Limit Apple code-signing work around to only the desktop OS (vs iDevices/TV)
+
+* remove stylistic "else"; no change in functionality
+
+Co-authored-by: Ryan Lucia <ryan@luciaonline.net>
+Signed-off-by: Hin-Tak Leung <htl10@users.sourceforge.net>
+---
+ mono/mini/main.c | 67 ++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 65 insertions(+), 2 deletions(-)
+
+diff --git a/mono/mini/main.c b/mono/mini/main.c
+index b857ec3ca4d..7cc3fecfa17 100644
+--- a/mono/mini/main.c
++++ b/mono/mini/main.c
+@@ -35,6 +35,9 @@
+ #    include "buildver-boehm.h"
+ #  endif
+ #endif
++#ifdef TARGET_OSX
++#include <mach-o/loader.h>
++#endif
+ 
+ //#define TEST_ICALL_SYMBOL_MAP 1
+ 
+@@ -179,8 +182,68 @@ probe_embedded (const char *program, int *ref_argc, char **ref_argv [])
+ 		goto doclose;
+ 	if (read (fd, sigbuffer, sizeof (sigbuffer)) == -1)
+ 		goto doclose;
+-	if (memcmp (sigbuffer+sizeof(uint64_t), "xmonkeysloveplay", 16) != 0)
+-		goto doclose;
++	// First, see if "xmonkeysloveplay" is at the end of file
++	if (memcmp (sigbuffer + sizeof (uint64_t), "xmonkeysloveplay", 16) == 0)
++		goto found;
++
++#ifdef TARGET_OSX
++	{
++		/*
++		 * If "xmonkeysloveplay" is not at the end of file,
++		 * on Mac OS X, we try a little harder, by actually
++		 * reading the binary's header structure, to see
++		 * if it is located at the end of a LC_SYMTAB section.
++		 *
++		 * This is because Apple code-signing appends a
++		 * LC_CODE_SIGNATURE section to the binary, so
++		 * for a signed binary, "xmonkeysloveplay" is no
++		 * longer at the end of file.
++		 *
++		 * The rest is sanity-checks for the header and section structures.
++		 */
++		struct mach_header_64 bin_header;
++		if ((sigstart = lseek (fd, 0, SEEK_SET)) == -1)
++			goto doclose;
++		// Find and check binary header
++		if (read (fd, &bin_header, sizeof (bin_header)) == -1)
++			goto doclose;
++		if (bin_header.magic != MH_MAGIC_64)
++			goto doclose;
++
++		off_t total = bin_header.sizeofcmds;
++		uint32_t count = bin_header.ncmds;
++		while (total > 0 && count > 0) {
++			struct load_command lc;
++			off_t sig_stored = lseek (fd, 0, SEEK_CUR); // get current offset
++			if (read (fd, &lc, sizeof (lc)) == -1)
++				goto doclose;
++			if (lc.cmd == LC_SYMTAB) {
++				struct symtab_command stc;
++				if ((sigstart = lseek (fd, -sizeof (lc), SEEK_CUR)) == -1)
++					goto doclose;
++				if (read (fd, &stc, sizeof (stc)) == -1)
++					goto doclose;
++
++				// Check the end of the LC_SYMTAB section for "xmonkeysloveplay"
++				if ((sigstart = lseek (fd, -(16 + sizeof (uint64_t)) + stc.stroff + stc.strsize, SEEK_SET)) == -1)
++					goto doclose;
++				if (read (fd, sigbuffer, sizeof (sigbuffer)) == -1)
++					goto doclose;
++				if (memcmp (sigbuffer + sizeof (uint64_t), "xmonkeysloveplay", 16) == 0)
++					goto found;
++			}
++			if ((sigstart = lseek (fd, sig_stored + lc.cmdsize, SEEK_SET)) == -1)
++				goto doclose;
++			total -= sizeof (lc.cmdsize);
++			count--;
++		}
++	}
++#endif
++
++	// did not find "xmonkeysloveplay" at end of file or end of LC_SYMTAB section
++	goto doclose;
++
++found:
+ 	directory_location = GUINT64_FROM_LE ((*(uint64_t *) &sigbuffer [0]));
+ 	if (lseek (fd, directory_location, SEEK_SET) == -1)
+ 		goto doclose;
+-- 
+2.26.2
+

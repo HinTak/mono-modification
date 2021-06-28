@@ -25,6 +25,10 @@ signed_binary = False
 
 multi_arch = False
 
+# Development option to quickly disable modifying
+# by putting this to True:
+dev_not_modifying = False
+
 if (len(exe_data.headers) > 1):
     print("Fat Binary:", len(exe_data.headers))
     multi_arch = True
@@ -55,7 +59,7 @@ for h in exe_data.headers:
             linkedit[1].filesize = file_size - linkedit[1].fileoff
             linkedit[1].vmsize = linkedit[1].filesize
 
-if (signed_binary or multi_arch):
+if (signed_binary or multi_arch or dev_not_modifying):
     print("The binary was signed or multi_arch. Not modifying.")
 else:
     # Change some header parameters.

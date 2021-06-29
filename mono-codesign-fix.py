@@ -43,7 +43,7 @@ if (len(exe_data.headers) > 1):
 for h in exe_data.headers:
     # Access Mach-O load commands
     for c in h.commands:
-        # 'c' is a tupple (command_metadata, segment, [section1, section2])
+        # 'c' is a tuple (command_metadata, segment, [section1, section2])
         #c[0].get_cmd_name()
         if (c[0].get_cmd_name() == 'LC_SYMTAB'):
             print("entry(LC_SYMTAB):\n\t", c[0].get_cmd_name(), c[1], c[2])

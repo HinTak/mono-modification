@@ -54,6 +54,8 @@ for h in exe_data.headers:
 if (beginning_of_signature != file_size):
     print("Beginning of signature:", beginning_of_signature)
     #print(end_of_SYMTAB, beginning_of_signature, beginning_of_signature - end_of_SYMTAB)
+    if (end_of_signature != file_size):
+        raise SystemExit("Signature not at End of file. Aborting!")
 
 if (exe_data.headers[-1].commands[-1][0].get_cmd_name() != 'LC_CODE_SIGNATURE'):
     raise SystemExit("last command not LC_CODE_SIGNATURE")

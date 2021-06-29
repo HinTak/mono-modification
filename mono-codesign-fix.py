@@ -72,7 +72,8 @@ if (end_of_signature != 0):
         print("End of Signature not at end of file:", end_of_signature)
     if (beginning_of_bundle != file_size):
         if (beginning_of_bundle == end_of_signature):
-            print("mkbundle with Native Mac OS X/default runtime detected. This may not work.")
+            print("mkbundle with Native Mac OS X/Signed default runtime detected. Aborting.")
+            dev_not_modifying = True
 
 if (end_of_signature == file_size):
     signed_binary = True

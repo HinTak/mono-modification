@@ -72,7 +72,8 @@ if (end_of_signature != 0):
         print("End of Signature not at end of file:", end_of_signature)
     if (beginning_of_bundle != file_size):
         if (beginning_of_bundle == end_of_signature):
-            print("mkbundle with Native Mac OS X/Signed default runtime detected. Aborting.")
+            print("Bundle made with Native Mac OS X/Signed default runtime detected.")
+            print("Use 'remove-code-signature.py' or 'codesign --remove-signature' to remove the signature first.")
             dev_not_modifying = True
 
 if (end_of_signature == file_size):

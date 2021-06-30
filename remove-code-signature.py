@@ -72,6 +72,9 @@ linkedit = [c for c in exe_data.headers[-1].commands if \
     str(c[1].segname).startswith("b'__LINKEDIT")][0]
 
 linkedit[1].filesize = end_of_SYMTAB - linkedit[1].fileoff
+# In one case, it is observed that `codesign -v --remove-signature ...`
+# adds about 100k to vmsize. This is probably a safety measure.
+# It should not be below filesize, for sure.
 linkedit[1].vmsize = linkedit[1].filesize
     
 #

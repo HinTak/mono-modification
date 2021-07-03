@@ -10,6 +10,15 @@
 
 # See also accompanying "mono-codesign-fix.py" script
 
+# The command to check entitlement is "codesign -d --entitlements :- /Applications/Whatever.app/".
+#
+# mono-6.12.0.140/mono-sgen64.stock is shipped with these (from "strings ..."):
+#     com.apple.security.cs.allow-jit
+#     com.apple.security.cs.allow-unsigned-executable-memory
+#     com.apple.security.cs.allow-dyld-environment-variables
+#     com.apple.security.cs.disable-library-validation
+# Some of the others besides "com.apple.security.cs.disable-library-validation" may be needed when re-signing.
+
 from macholib.MachO import MachO
 from os import stat
 from sys import argv

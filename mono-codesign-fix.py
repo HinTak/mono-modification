@@ -8,6 +8,22 @@
 
 # discussed in https://github.com/mono/mono/issues/17881
 
+
+# Apple's codesign "-o runtime" option requires "com.apple.security.cs.disable-library-validation" entitlement
+# for mkbundle'ed generated mono executuable to work.
+
+# Here is the actual entitlement file:
+# https://github.com/HinTak/FontVal-MacGUI/blob/master/FontValidator/FontValidator/FontValidator.entitlements
+# and the literal signing command:
+# https://github.com/HinTak/FontVal-MacGUI/blob/master/FontValidator/FontValidator/codesign%20command.txt
+
+# More Reading on Hardened Runtime, and System Integrity Protection (SIP):
+# https://developer.apple.com/documentation/security/hardened_runtime
+# https://developer.apple.com/documentation/bundleresources/entitlements/com_apple_security_cs_disable-library-validation
+
+# Somewhat related issue in Xamarin Mac IOS:
+# https://github.com/xamarin/xamarin-macios/issues/4288
+
 from macholib.MachO import MachO
 from os import stat
 from sys import argv

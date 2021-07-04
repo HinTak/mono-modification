@@ -10,6 +10,9 @@ in 6.13 onwards and backported in mono-6.12.0.98 onwards; but not yet available 
 
 ## Using mkbundle for Mac OS X
 
+Seeing as the problem is not going to have a clean and short solution any time soon, here is the detailed process of using mkbundle
+to build standalone binaries compatible with Apple's Hardened Runtime, System Integrity Protection (SIP) and Notarization:
+
 - You need at least mono 6.12.0.98+ or mono 6.13+
 
 - Remove original signature if using recent native default mono runtime on Mac OS X. Either

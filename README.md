@@ -7,3 +7,24 @@ mono's mkbundle:
 in 6.13 onwards and backported in mono-6.12.0.98 onwards; but not yet available to `mkbundle --fetch-target ...` yet.
 
 - https://github.com/mono/mono/issues/17881
+
+## Using mkbundle for Mac OS X
+
+- You need at least mono 6.12.0.98+ or mono 6.13+
+
+- Remove original signature if using recent native default mono runtime on Mac OS X. Either
+`remove-code-signature.py /Library/Frameworks/Mono.framework/Versions/Current/bin/mono-sgen64` or `codesign -v --remove-signature ...` should be fine.
+
+- Run `mkbundle ...`
+
+- Run `mono-codesign-fix.py` to fix up offsets.
+
+- Create entitlement file and re-sign with extra entitlement. `com.apple.security.cs.disable-library-validation` is definitely needed.
+The original mono binary was signed with
+`com.apple.security.cs.allow-jit`,
+`com.apple.security.cs.allow-unsigned-executable-memory`,
+`com.apple.security.cs.allow-dyld-environment-variables`,
+and
+`com.apple.security.cs.disable-library-validation`. So the other 3 might be needed for other more sophisticated usage of `mkbundle`.
+
+- Set up some provisioning profile to test?

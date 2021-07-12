@@ -72,6 +72,6 @@ Pre-modified libraries are in `mkbundle-support/libs/`.
 
 ## Others
 
-Winforms applications do not work under 64-bit mono.
+Winforms applications do not work under 64-bit mono. Mac OS X 10.15 (Catalina) onwards is 64-bit only, and loses the ability to run 32-bit applications.
 
 Anything (even non-GUI) that depends on libfontconfig takes a while to start the first time, from rebuilding the font cache.

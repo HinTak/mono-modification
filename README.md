@@ -31,3 +31,12 @@ and
 `com.apple.security.cs.disable-library-validation`. So the other 3 might be needed for other more sophisticated usage of `mkbundle`.
 
 - Set up some provisioning profile to test?
+
+## Unpacking Mono's Mac OS X installer on non-Mac OS X
+
+```
+wget -m https://download.mono-project.com/archive/6.12.0/macos-10-universal/MonoFramework-MDK-6.12.0.122.macos10.xamarin.universal.pkg
+mkdir -p /tmp/Mono
+xar -C /tmp/Mono -xpvf "download.mono-project.com/archive/6.12.0/macos-10-universal/MonoFramework-MDK-6.12.0.122.macos10.xamarin.universal.pkg"
+zcat /tmp/Mono/mono.pkg/Payload | cpio -m -d --extract
+```

@@ -1,24 +1,15 @@
-	/Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libgdiplus.0.dylib (compatibility version 1.0.0, current version 1.0.0)
-	/Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libglib-2.0.0.dylib (compatibility version 3601.0.0, current version 3601.4.0)
-	/Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libintl.8.dylib (compatibility version 10.0.0, current version 10.2.0)
-	/Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libcairo.2.dylib (compatibility version 11203.0.0, current version 11203.14.0)
-	/Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libpixman-1.0.dylib (compatibility version 31.0.0, current version 31.0.0)
-	/Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libtiff.5.dylib (compatibility version 9.0.0, current version 9.0.0)
-	/Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libjpeg.8.dylib (compatibility version 9.0.0, current version 9.0.0)
-	/Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libgif.4.1.6.dylib (compatibility version 6.0.0, current version 6.6.0)
-	/Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libfontconfig.1.dylib (compatibility version 8.0.0, current version 8.2.0)
-	/Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libfreetype.6.dylib (compatibility version 17.0.0, current version 17.2.0)
-	/Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libpng14.14.dylib (compatibility version 27.0.0, current version 27.0.0)
-	/Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libexpat.1.6.7.dylib (compatibility version 8.0.0, current version 8.7.0)
-	/Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libgdiplus.0.dylib (compatibility version 1.0.0, current version 1.0.0)
-	/Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libglib-2.0.0.dylib (compatibility version 3601.0.0, current version 3601.4.0)
-	/Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libintl.8.dylib (compatibility version 10.0.0, current version 10.2.0)
-	/Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libcairo.2.dylib (compatibility version 11203.0.0, current version 11203.14.0)
-	/Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libpixman-1.0.dylib (compatibility version 31.0.0, current version 31.0.0)
-	/Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libtiff.5.dylib (compatibility version 9.0.0, current version 9.0.0)
-	/Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libjpeg.8.dylib (compatibility version 9.0.0, current version 9.0.0)
-	/Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libgif.4.1.6.dylib (compatibility version 6.0.0, current version 6.6.0)
-	/Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libfontconfig.1.dylib (compatibility version 8.0.0, current version 8.2.0)
-	/Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libfreetype.6.dylib (compatibility version 17.0.0, current version 17.2.0)
-	/Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libpng14.14.dylib (compatibility version 27.0.0, current version 27.0.0)
-	/Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libexpat.1.6.7.dylib (compatibility version 8.0.0, current version 8.7.0)
+#!/bin/sh
+x86_64-apple-darwin9-install_name_tool \
+-change /Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libgdiplus.0.dylib     @loader_path/libgdiplus.0.dylib      \
+-change /Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libglib-2.0.0.dylib    @loader_path/libglib-2.0.0.dylib     \
+-change /Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libintl.8.dylib        @loader_path/libintl.8.dylib         \
+-change /Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libcairo.2.dylib       @loader_path/libcairo.2.dylib        \
+-change /Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libpixman-1.0.dylib    @loader_path/libpixman-1.0.dylib     \
+-change /Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libtiff.5.dylib        @loader_path/libtiff.5.dylib         \
+-change /Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libjpeg.8.dylib        @loader_path/libjpeg.8.dylib         \
+-change /Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libgif.4.1.6.dylib     @loader_path/libgif.4.1.6.dylib      \
+-change /Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libfontconfig.1.dylib  @loader_path/libfontconfig.1.dylib   \
+-change /Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libfreetype.6.dylib    @loader_path/libfreetype.6.dylib     \
+-change /Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libpng14.14.dylib      @loader_path/libpng14.14.dylib       \
+-change /Library/Frameworks/Mono.framework/Versions/6.12.0/lib/libexpat.1.6.7.dylib   @loader_path/libexpat.1.6.7.dylib    \
+$1

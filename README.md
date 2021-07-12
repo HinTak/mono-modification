@@ -40,3 +40,38 @@ mkdir -p /tmp/Mono
 xar -C /tmp/Mono -xpvf "download.mono-project.com/archive/6.12.0/macos-10-universal/MonoFramework-MDK-6.12.0.122.macos10.xamarin.universal.pkg"
 zcat /tmp/Mono/mono.pkg/Payload | cpio -m -d --extract
 ```
+
+`install_name_script` in the `mkbundle-support` directory.
+
+
+```
+find libs -type f -name '*.dylib' -exec install_name_script {} \;
+find libs -type f -name '*.dylib' -exec 86_64-apple-darwin9-otool -L {} \;
+```
+
+The dependency chains are:
+
+```
+libexpat.1.6.7.dylib
+libgif.4.1.6.dylib
+libintl.8.dylib
+libjpeg.8.dylib
+libpixman-1.0.dylib
+libpng14.14.dylib
+libpng14.14.dylib -> libfreetype.6.dylib
+libpng14.14.dylib -> libfreetype.6.dylib -> libfontconfig.1.dylib
+libjpeg.8.dylib -> libtiff.5.dylib
+libpixman-1.0.dylib -> [ libpng14.14.dylib -> libfreetype.6.dylib -> libfontconfig.1.dylib ] -> libcairo.2.dylib
+libintl.8.dylib -> libglib-2.0.0.dylib
+#
+libexpat.1.6.7.dylib -> libgif.4.1.6.dylib -> libpixman-1.0.dylib ->
+[ libjpeg.8.dylib -> libtiff.5.dylib ] -> [libintl.8.dylib -> libglib-2.0.0.dylib ] -> [ [ libpng14.14.dylib -> libfreetype.6.dylib -> libfontconfig.1.dylib ] -> libcairo.2.dylib ] -> libgdiplus.dylib
+```
+
+Pre-modified libraries are in `mkbundle-support/libs/`.
+
+## Others
+
+Winforms applications do not work under 64-bit mono.
+
+Anything (even non-GUI) that depends on libfontconfig takes a while to start the first time, from rebuilding the font cache.

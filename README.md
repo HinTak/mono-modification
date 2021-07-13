@@ -46,7 +46,7 @@ zcat /tmp/Mono/mono.pkg/Payload | cpio -m -d --extract
 
 ```
 find libs -type f -name '*.dylib' -exec install_name_script {} \;
-find libs -type f -name '*.dylib' -exec 86_64-apple-darwin9-otool -L {} \;
+find libs -type f -name '*.dylib' -exec x86_64-apple-darwin9-otool -L {} \;
 ```
 
 The dependency chains are:

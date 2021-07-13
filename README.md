@@ -65,7 +65,7 @@ libpixman-1.0.dylib -> [ libpng14.14.dylib -> libfreetype.6.dylib -> libfontconf
 libintl.8.dylib -> libglib-2.0.0.dylib
 #
 libexpat.1.6.7.dylib -> libgif.4.1.6.dylib -> libpixman-1.0.dylib ->
-[ libjpeg.8.dylib -> libtiff.5.dylib ] -> [libintl.8.dylib -> libglib-2.0.0.dylib ] -> [ [ libpng14.14.dylib -> libfreetype.6.dylib -> libfontconfig.1.dylib ] -> libcairo.2.dylib ] -> libgdiplus.dylib
+[ libjpeg.8.dylib -> libtiff.5.dylib ] -> [ libintl.8.dylib -> libglib-2.0.0.dylib ] -> [ [ libpng14.14.dylib -> libfreetype.6.dylib -> libfontconfig.1.dylib ] -> libcairo.2.dylib ] -> libgdiplus.dylib
 ```
 
 Pre-modified libraries are in `mkbundle-support/libs/`.

@@ -82,9 +82,9 @@ for h in exe_data.headers:
     linkedit = [c for c in h.commands if \
         hasattr(c[1], 'segname') and \
         str(c[1].segname).startswith("b'__LINKEDIT")][0]
-    print("4th(LC_SEGMENT_64/__LINKEDIT):\n\t", linkedit[0].get_cmd_name(), linkedit[1], linkedit[2])
+    print("entry(LC_SEGMENT*/__LINKEDIT):\n\t", linkedit[0].get_cmd_name(), linkedit[1], linkedit[2])
     # check that it is an executable, instead of e.g. dylib
-    if (linkedit[0].get_cmd_name() == 'LC_SEGMENT_64'):
+    if (linkedit[0].get_cmd_name() == 'LC_SEGMENT_64' or linkedit[0].get_cmd_name() == 'LC_SEGMENT'):
         print(file_size, linkedit[1].fileoff + linkedit[1].filesize, ((linkedit[1].vmsize - linkedit[1].filesize) == 0))
         if (file_size != linkedit[1].fileoff + linkedit[1].filesize and (not multi_arch)):
             beginning_of_bundle = linkedit[1].fileoff + linkedit[1].filesize

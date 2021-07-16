@@ -67,7 +67,7 @@ if (beginning_of_signature != file_size):
         raise SystemExit("Signature not at End of file. Aborting!")
 
 if (exe_data.headers[-1].commands[-1][0].get_cmd_name() != 'LC_CODE_SIGNATURE'):
-    raise SystemExit("last command not LC_CODE_SIGNATURE")
+    raise SystemExit("last command not LC_CODE_SIGNATURE, no need to modify.")
 else:
     del exe_data.headers[-1].commands[-1]
 

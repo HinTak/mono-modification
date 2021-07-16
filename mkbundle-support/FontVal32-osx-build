@@ -1,8 +1,18 @@
 #!/bin/sh
-MONO_PATH=. mkbundle -v --config config --i18n all --cross mono-4.8.0-osx-10.7-x86.zip \
--o FontVal-2.1.1-py-osx-10.7-x64/FontVal-32 FontVal.exe \
+
+
+
+#    `Mono.WebBrowser' referenced by `~/.mono/targets/mono-4.8.0-osx-10.7-x86/lib/mono/4.5/System.Windows.Forms.dll'
+cp -p /usr/lib/mono/4.5/Mono.WebBrowser.dll .
+#    `Mono.Data.Tds' referenced by `~/.mono/targets/mono-4.8.0-osx-10.7-x86/lib/mono/4.5/System.Data.dll'
+cp -p /usr/lib/mono/4.5/Mono.Data.Tds.dll .
+
+mkdir -p FontVal-2.1.6-osx-10.7-x86
+
+MONO_PATH=. mkbundle -v --config config --i18n all --cross mono-4.8.0-osx-10.7-x86 \
+-o FontVal-2.1.6-osx-10.7-x86/FontVal-32 FontVal.exe \
 --library libfreetype.6.dylib,Darwin/libfreetype.6.dylib --library libfreetype6.dylib,Darwin/libfreetype.6.dylib \
---library libs/libexpat.1.5.2.dylib --library libs/libgif.4.1.6.dylib --library libs/libintl.8.dylib \
+--library libs/libexpat.1.6.7.dylib --library libs/libgif.4.1.6.dylib --library libs/libintl.8.dylib \
 --library libs/libjpeg.8.dylib --library libs/libpixman-1.0.dylib --library libs/libpng14.14.dylib \
 --library libs/libglib-2.0.0.dylib --library libs/libtiff.5.dylib --library libs/libfontconfig.1.dylib \
 --library libs/libcairo.2.dylib --library libgdiplus.dylib,libs/libgdiplus.0.dylib

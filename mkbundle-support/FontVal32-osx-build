@@ -10,7 +10,7 @@
 
 
 # When using the "--cross" switch, it is occasionally necessary
-# to get assemblies from the host runtime:
+# to get assemblies from the host runtime (#10490 below):
 #
 #    `Mono.WebBrowser' referenced by `~/.mono/targets/mono-4.8.0-osx-10.7-x86/lib/mono/4.5/System.Windows.Forms.dll'
 ##cp -p /usr/lib/mono/4.5/Mono.WebBrowser.dll .
@@ -66,3 +66,14 @@ MONO_PATH=. mkbundle -v --config config --i18n all --sdk /tmp/Library/Frameworks
 # - For apps of other functionalities, you may need to add one or more of
 #   "libMonoPosixHelper.dylib", "libmono-native-compat.dylib",
 #   or "libmono-btls-shared.dylib" to the library list, near the beginning.
+#
+#
+# For some background reading, see also some of the still-opened issues
+# I filed on mkbundle and work-arounds for most of them:
+#
+# https://github.com/mono/mono/issues/10478
+# Bug 59076 mkbundle --cross mono-5.2.0-*.zip --library broken because of mis-built 5.2.0 targets.
+# https://github.com/mono/mono/issues/10479
+# mkbundle --cross takes mscorlib.dll from host, and result binary breaks with version mismatch.
+# https://github.com/mono/mono/issues/10490
+# mkundle cross mono-5.14.0-* targets missing some dependent dll's

@@ -68,6 +68,9 @@ MONO_PATH=. mkbundle -v --config config --i18n all --sdk /tmp/Library/Frameworks
 #   "libMonoPosixHelper.dylib", "libmono-native-compat.dylib",
 #   or "libmono-btls-shared.dylib" to the library list, near the beginning.
 #
+# - Setting MONO_LOG_LEVEL=debug and MONO_LOG_MASK=dll is useful
+#   for debugging, when binaries made from mkbundle fail to run.
+#
 #
 # For some background reading, see also some of the still-opened issues
 # I filed on mkbundle and work-arounds for most of them:

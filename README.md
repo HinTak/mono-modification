@@ -18,7 +18,8 @@ to build standalone binaries compatible with Apple's Hardened Runtime, System In
 - Remove original signature if using recent native default mono runtime on Mac OS X. Either
 `remove-code-signature.py /Library/Frameworks/Mono.framework/Versions/Current/bin/mono-sgen64` or `codesign -v --remove-signature ...` should be fine.
 
-- Run `mkbundle ...`
+- Run `mkbundle ...` . The libgdiplus-dependent older Winforms GUI is very troublesome to build, and has its own
+1000-character command line in `mkbundle-support/FontVal32-osx-build` and extensive commentary therein.
 
 - Run `mono-codesign-fix.py` to fix up offsets.
 

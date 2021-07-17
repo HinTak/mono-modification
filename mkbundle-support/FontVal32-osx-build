@@ -49,6 +49,7 @@ MONO_PATH=. mkbundle -v --config config --i18n all --sdk /tmp/Library/Frameworks
 #   (See https://github.com/mono/mono/issues/6701)
 #   This also have the consequence that the outcome won't work on Mac OS X 10.15
 #   onwards, which loses the ability to run 32-bit applications.
+#   The switch from --cross to --sdk is due to #21139 (below).
 #
 # - FontVal has a customized and enhanced libfreetype, which includes its own
 #   libpng and so does not depend on anything else. Other applications, using
@@ -77,3 +78,5 @@ MONO_PATH=. mkbundle -v --config config --i18n all --sdk /tmp/Library/Frameworks
 # mkbundle --cross takes mscorlib.dll from host, and result binary breaks with version mismatch.
 # https://github.com/mono/mono/issues/10490
 # mkundle cross mono-5.14.0-* targets missing some dependent dll's
+# https://github.com/mono/mono/issues/21139
+# Only mono up to 6.8.0 is available in "mkbundle --list-targets"

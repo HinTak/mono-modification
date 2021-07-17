@@ -1,16 +1,18 @@
 #!/bin/sh
 
 
-
+# When using the "--cross" switch, it is occasionally necessary
+# to get assemblies from the host runtime:
+#
 #    `Mono.WebBrowser' referenced by `~/.mono/targets/mono-4.8.0-osx-10.7-x86/lib/mono/4.5/System.Windows.Forms.dll'
-cp -p /usr/lib/mono/4.5/Mono.WebBrowser.dll .
+##cp -p /usr/lib/mono/4.5/Mono.WebBrowser.dll .
 #    `Mono.Data.Tds' referenced by `~/.mono/targets/mono-4.8.0-osx-10.7-x86/lib/mono/4.5/System.Data.dll'
-cp -p /usr/lib/mono/4.5/Mono.Data.Tds.dll .
+##cp -p /usr/lib/mono/4.5/Mono.Data.Tds.dll .
 
-mkdir -p FontVal-2.1.6-osx-10.7-x86
+mkdir -p FontVal-2.1.6-osx-10.9-i386
 
-MONO_PATH=. mkbundle -v --config config --i18n all --cross mono-4.8.0-osx-10.7-x86 \
--o FontVal-2.1.6-osx-10.7-x86/FontVal-32 FontVal.exe \
+MONO_PATH=. mkbundle -v --config config --i18n all --sdk /tmp/Library/Frameworks/Mono.framework/Versions/6.12.0/ \
+-o FontVal-2.1.6-osx-10.9-i386/FontVal-32 FontVal.exe \
 --library libfreetype.6.dylib,Darwin/libfreetype.6.dylib --library libfreetype6.dylib,Darwin/libfreetype.6.dylib \
 --library libs/libexpat.1.6.7.dylib --library libs/libgif.4.1.6.dylib --library libs/libintl.8.dylib \
 --library libs/libjpeg.8.dylib --library libs/libpixman-1.0.dylib --library libs/libpng14.14.dylib \

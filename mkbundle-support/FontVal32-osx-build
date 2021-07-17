@@ -1,5 +1,13 @@
 #!/bin/sh
 
+################################################################################
+#
+# This script is to be copied, together with "config" and "libs" into
+# the directory where "FontVal.exe" is located, after its build,
+# and run from there.
+#
+################################################################################
+
 
 # When using the "--cross" switch, it is occasionally necessary
 # to get assemblies from the host runtime:
@@ -18,3 +26,43 @@ MONO_PATH=. mkbundle -v --config config --i18n all --sdk /tmp/Library/Frameworks
 --library libs/libjpeg.8.dylib --library libs/libpixman-1.0.dylib --library libs/libpng14.14.dylib \
 --library libs/libglib-2.0.0.dylib --library libs/libtiff.5.dylib --library libs/libfontconfig.1.dylib \
 --library libs/libcairo.2.dylib --library libgdiplus.dylib,libs/libgdiplus.0.dylib
+
+################################################################################
+# A few explanations of the command-line:
+
+# - "MONO_PATH=." tells mkbundle to looks for FontVal.exe's dependencies in
+#   the current directory. It depends on 7 other dll's. Mono itself by default
+#   looks for dependent dlls in the same directory, but mkbundle does not.
+#   It is easier and safer to tell mkbundle where to find the rest,
+#   than to list all 7 of them.
+#
+# - "--i18n all" is specific to applications like FontVal which needs
+#   internationalization support from EVERY language besides English.
+#   It makes the outcome a lot larger. Most other applications do not need it.
+#
+# - "--sdk ..." is unpacked and extracted from the mono's Mac OS X installer.
+#   It is largely the same as what the installer would install (without "/tmp"),
+#   except "bin/mono" (linked to "mono-sgen64") is replaced with a modified copy
+#   of "bin/mono-sgen32", with its signature removed with the accompanying
+#   "remove-code-signature.py" script. Using 32-bit mono is necessary
+#   as Mono's 64-bit System.Windows.Forms (for GUI-based app) is incomplete.
+#   (See https://github.com/mono/mono/issues/6701)
+#   This also have the consequence that the outcome won't work on Mac OS X 10.15
+#   onwards, which loses the ability to run 32-bit applications.
+#
+# - FontVal has a customized and enhanced libfreetype, which includes its own
+#   libpng and so does not depend on anything else. Other applications, using
+#   Mono-shipped freetype, likely want to put "--library libfreetype.6.dylib"
+#   after libpng (which most builds of libfreetype depends on), and before
+#   fontconfig (which depends on freetype).
+#
+# - The libraries are all modified from 6.0.122 with the accompanying
+#   "install_name_script" script, to change to @loader_path for library look-up.
+#
+# - The "--library ..." entries must be in dependency order, later ones
+#   depends on earlier ones. The above is correct as of 6.0.122, but
+#   this list may be different in the future.
+#
+# - For apps of other functionalities, you may need to add one or more of
+#   "libMonoPosixHelper.dylib", "libmono-native-compat.dylib",
+#   or "libmono-btls-shared.dylib" to the library list, near the beginning.

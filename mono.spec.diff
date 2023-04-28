@@ -1,0 +1,164 @@
+--- mono.spec-original	2019-10-14 05:59:56.000000000 +0100
++++ mono.spec	2023-04-28 21:12:29.650456903 +0100
+@@ -23,7 +23,7 @@
+ %global xamarinrelease 34
+ Name:           mono
+ Version:        5.20.1
+-Release:        2%{?dist}
++Release:        2s%{?dist}
+ Summary:        Cross-platform, Open Source, .NET development framework
+ 
+ License:        MIT
+@@ -39,7 +39,7 @@
+ Source2:        mono-find-provides
+ Source3:        mono-find-requires
+ Source4:        mono.attr
+-Patch0:         mono-5.10.0-ignore-reference-assemblies.patch
++#Patch0:         mono-5.10.0-ignore-reference-assemblies.patch
+ Patch1:         mono-4.2.1-ppc.patch
+ Patch2:         mono-5.10.0-find-provides.patch
+ Patch3:         mono-4.2-fix-winforms-trayicon.patch
+@@ -47,10 +47,14 @@
+ Patch5:         mono-5.18.0-roslyn-binaries.patch
+ Patch6:         mono-5.18.0-use-mcs.patch
+ Patch7:         mono-5.18.0-use-v471.patch
+-Patch8:         mono-5.18.0-reference-assemblies-fix.patch
++#Patch8:         mono-5.18.0-reference-assemblies-fix.patch
+ Patch9:         mono-5.18.0-sharpziplib-parent-path-traversal.patch
+ Patch10:        mono-5.18.1-python3.patch
+ 
++Patch20: mono-2.6-largeheap.patch
++Patch30: mono-5-tls.diff
++Epoch: 100
++
+ BuildRequires:  bison
+ BuildRequires:  python%{python3_pkgversion}
+ BuildRequires:  cmake
+@@ -79,7 +83,7 @@
+ ExclusiveArch: %mono_arches
+ 
+ %global _use_internal_dependency_generator 0
+-%global __find_provides env sh -c 'filelist=($(cat)) && { printf "%s\\n" "${filelist[@]}" | grep -v 4.7.1-api | grep -v 4.5-api| /usr/lib/rpm/redhat/find-provides && printf "%s\\n" "${filelist[@]}" | grep -v 4.7.1-api | grep -v 4.5-api | prefix=%{buildroot}%{_prefix} %{buildroot}%{_bindir}/mono-find-provides; } | sort | uniq'
++%global __find_provides env sh -c 'filelist=($(cat)) && { printf "%s\\n" "${filelist[@]}" | /usr/lib/rpm/redhat/find-provides && printf "%s\\n" "${filelist[@]}" | prefix=%{buildroot}%{_prefix} %{buildroot}%{_bindir}/mono-find-provides; } | sort | uniq'
+ %global __find_requires env sh -c 'filelist=($(cat)) && { printf "%s\\n" "${filelist[@]}" | /usr/lib/rpm/redhat/find-requires && printf "%s\\n" "${filelist[@]}" | prefix=%{buildroot}%{_prefix} %{buildroot}%{_bindir}/mono-find-requires; } | sort | uniq | grep ^...'
+ 
+ %description
+@@ -118,6 +122,7 @@
+ Provides:       mono(System.Text.Encoding.Extensions) = 4.0.0.0
+ Provides:       mono(System.Threading) = 4.0.0.0
+ Provides:       mono(System.Xml.XPath.XDocument) = 4.0.1.0
++Provides:       mono(Mono.Cecil) = 0.10.0.0
+ 
+ %description core
+ This package contains the core of the Mono runtime including its
+@@ -325,7 +330,7 @@
+ %prep
+ %setup -q -n %{name}-%{version}.%{xamarinrelease}
+ 
+-%patch0 -p1
++#%patch0 -p1
+ %ifarch ppc ppc64 ppc64le s390x
+ %patch1 -p1
+ %endif
+@@ -335,24 +340,27 @@
+ %patch5 -p1
+ %patch6 -p1
+ %patch7 -p1
+-%patch8 -p1
++#%patch8 -p1
+ %patch9 -p1
+ %patch10 -p1
+ 
++%patch20 -p1 -b .largeheap
++%patch30 -p1 -b .tls
++
+ # Remove hardcoded lib directory for libMonoPosixHelper.so from the config
+ sed -i 's|$mono_libdir/||g' data/config.in
+ 
+ %if 0%{bootstrap}
+ # for bootstrap, keep some binaries
+-find . -name "*.dll" -not -path "./mcs/class/lib/monolite-linux/*" -not -path "./external/binary-reference-assemblies/v4.7.1/*" -print -delete
+-find . -name "*.exe" -not -path "./mcs/class/lib/monolite-linux/*" -print -delete
++#find . -name "*.dll" -not -path "./mcs/class/lib/monolite-linux/*" -not -path "./external/binary-reference-assemblies/v4.7.1/*" -print -delete
++#find . -name "*.exe" -not -path "./mcs/class/lib/monolite-linux/*" -print -delete
+ %else
+ # Remove all prebuilt binaries
+-rm -rf mcs/class/lib/monolite-linux/*
+-find . -name "*.dll" -print -delete
+-find . -name "*.exe" -print -delete
++#rm -rf mcs/class/lib/monolite-linux/*
++#find . -name "*.dll" -print -delete
++#find . -name "*.exe" -print -delete
+ # use the binaries from the currently installed mono
+-cd external/binary-reference-assemblies && mv v4.7.1 v4.7.1.tobuild && ln -s /usr/lib/mono/4.7.1-api v4.7.1 && cd -
++#cd external/binary-reference-assemblies && mv v4.7.1 v4.7.1.tobuild && ln -s /usr/lib/mono/4.7.1-api v4.7.1 && cd -
+ %endif
+ 
+ %build
+@@ -373,9 +381,9 @@
+ make %{?_smp_mflags}
+ 
+ # rebuild the reference assemblies
+-cd external/binary-reference-assemblies && if [ -d v4.7.1.tobuild ]; then rm -f v4.7.1 && mv v4.7.1.tobuild v4.7.1; fi && cd -
+-find ./external/binary-reference-assemblies/v4.7.1/ -name \*.dll -print -delete
+-BUILD_PATH=`pwd` && cd ./external/binary-reference-assemblies/ && MONO_PATH=$BUILD_PATH/mcs/class/lib/net_4_x-linux/ V=1 CSC="$BUILD_PATH/runtime/mono-wrapper $BUILD_PATH/mcs/class/lib/net_4_x-linux/mcs.exe" make -C v4.7.1
++#cd external/binary-reference-assemblies && if [ -d v4.7.1.tobuild ]; then rm -f v4.7.1 && mv v4.7.1.tobuild v4.7.1; fi && cd -
++#find ./external/binary-reference-assemblies/v4.7.1/ -name \*.dll -print -delete
++#BUILD_PATH=`pwd` && cd ./external/binary-reference-assemblies/ && MONO_PATH=$BUILD_PATH/mcs/class/lib/net_4_x-linux/ V=1 CSC="$BUILD_PATH/runtime/mono-wrapper $BUILD_PATH/mcs/class/lib/net_4_x-linux/mcs.exe" make -C v4.7.1
+ 
+ %install
+ make install DESTDIR=%{buildroot}
+@@ -385,8 +393,8 @@
+ install -p -m0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/pki/mono/
+ 
+ # install the newly built reference assembly dlls
+-mkdir -p %{buildroot}%{_monodir}/4.7.1-api
+-cp external/binary-reference-assemblies/v4.7.1/*.dll %{buildroot}%{_monodir}/4.7.1-api
++#mkdir -p %{buildroot}%{_monodir}/4.7.1-api
++#cp external/binary-reference-assemblies/v4.7.1/*.dll %{buildroot}%{_monodir}/4.7.1-api
+ 
+ # This was removed upstream:
+ # remove .la files (they are generally bad news)
+@@ -451,9 +459,9 @@
+ rm -rf %{buildroot}/usr/lib/debug/usr/lib64/libmono-native.so*.debug
+ 
+ # create a symbolic link so that Fedora packages targetting Framework 4.5 will still build
+-cd %{buildroot}/usr/lib/mono && ln -s 4.7.1-api 4.5-api && cd -
++#cd %{buildroot}/usr/lib/mono && ln -s 4.7.1-api 4.5-api && cd -
+ # as requested in bug 1704861; we have had that link in F29 with Mono 4.8 as well.
+-cd %{buildroot}/usr/lib/mono && ln -s 4.7.1-api 4.0-api && cd -
++#cd %{buildroot}/usr/lib/mono && ln -s 4.7.1-api 4.0-api && cd -
+ 
+ # rpm helper scripts
+ mkdir -p %{buildroot}%{_prefix}/lib/rpm/fileattrs/
+@@ -604,6 +612,20 @@
+ %gac_dll System.Workflow.ComponentModel
+ %gac_dll System.Workflow.Runtime
+ %gac_dll Mono.Profiler.Log
++%{_monodir}/2.0-api/
++%{_monodir}/3.5-api/
++%{_monodir}/4.0/
++%{_monodir}/4.0-api/
++%{_monodir}/4.5/
++%{_monodir}/4.5-api/
++%{_monodir}/4.5.1-api/
++%{_monodir}/4.5.2-api/
++%{_monodir}/4.6-api/
++%{_monodir}/4.6.1-api/
++%{_monodir}/4.6.2-api/
++%{_monodir}/4.7-api/
++%{_monodir}/4.7.1-api/
++%{_monodir}/4.7.2-api/
+ 
+ %files devel
+ %{_sysconfdir}/pki/mono/
+@@ -696,9 +718,6 @@
+ %gac_dll Mono.XBuild.Tasks
+ %gac_dll System.Windows
+ %gac_dll System.Xml.Serialization
+-%{_monodir}/4.7.1-api/
+-%{_monodir}/4.5-api
+-%{_monodir}/4.0-api
+ %{_monodir}/4.5/Microsoft.Common.tasks
+ %{_monodir}/4.5/MSBuild/Microsoft.Build*
+ %{_monodir}/4.5/Microsoft.Build.xsd

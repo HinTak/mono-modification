@@ -1,0 +1,39 @@
+diff -ruBb orig/mono-2.4.2/libgc/include/private/gc_priv.h mono-2.4.2/libgc/include/private/gc_priv.h
+--- orig/mono-2.4.2/libgc/include/private/gc_priv.h	2009-02-13 23:32:31.000000000 +0000
++++ mono-2.4.2/libgc/include/private/gc_priv.h	2009-06-21 13:12:51.000000000 +0100
+@@ -229,14 +229,8 @@
+ #endif
+ 
+ 
+-# ifndef LARGE_CONFIG
+-#   define MINHINCR 16	 /* Minimum heap increment, in blocks of HBLKSIZE  */
+-			 /* Must be multiple of largest page size.	   */
+-#   define MAXHINCR 2048 /* Maximum heap increment, in blocks              */
+-# else
+ #   define MINHINCR 64
+ #   define MAXHINCR 4096
+-# endif
+ 
+ # define TIME_LIMIT 50	   /* We try to keep pause times from exceeding	 */
+ 			   /* this by much. In milliseconds.		 */
+@@ -972,19 +966,7 @@
+ # ifdef PROC_VDB
+     page_hash_table _written_pages;	/* Pages ever dirtied	*/
+ # endif
+-# ifdef LARGE_CONFIG
+-#   if CPP_WORDSZ > 32
+-#     define MAX_HEAP_SECTS 4096 	/* overflows at roughly 64 GB	   */
+-#   else
+-#     define MAX_HEAP_SECTS 768		/* Separately added heap sections. */
+-#   endif
+-# else
+-#   ifdef SMALL_CONFIG
+-#     define MAX_HEAP_SECTS 128		/* Roughly 256MB (128*2048*1K)	*/
+-#   else
+-#     define MAX_HEAP_SECTS (384+128)		/* Roughly 4GB			*/
+-#   endif
+-# endif
++#     define MAX_HEAP_SECTS 16384 	/* overflows at roughly 64 GB	   */
+   struct HeapSect {
+       ptr_t hs_start; word hs_bytes;
+   } _heap_sects[MAX_HEAP_SECTS];

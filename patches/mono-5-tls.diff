@@ -1,0 +1,25 @@
+--- mono-5.20.1.34/mono/utils/mono-tls.c.orig	2019-07-16 19:16:12.000000000 +0100
++++ mono-5.20.1.34/mono/utils/mono-tls.c	2023-04-27 23:42:58.641798480 +0100
+@@ -162,15 +162,16 @@
+ // static and anonymous namespace both fail to link otherwise; Linux/amd64/gcc.
+ #define MONO_TLS_STATIC /* nothing */
+ #else
+-#define MONO_TLS_STATIC static
++#define MONO_TLS_STATIC
+ #endif
+ 
++
+ /* Tls variables for each MonoTlsKey */
+-MONO_TLS_STATIC MONO_KEYWORD_THREAD MonoInternalThread *mono_tls_thread MONO_TLS_FAST;
+-MONO_TLS_STATIC MONO_KEYWORD_THREAD MonoJitTlsData     *mono_tls_jit_tls MONO_TLS_FAST;
+-MONO_TLS_STATIC MONO_KEYWORD_THREAD MonoDomain         *mono_tls_domain MONO_TLS_FAST;
+-MONO_TLS_STATIC MONO_KEYWORD_THREAD SgenThreadInfo     *mono_tls_sgen_thread_info MONO_TLS_FAST;
+-MONO_TLS_STATIC MONO_KEYWORD_THREAD MonoLMF           **mono_tls_lmf_addr MONO_TLS_FAST;
++MONO_TLS_STATIC MONO_KEYWORD_THREAD MonoInternalThread *mono_tls_thread MONO_TLS_FAST __attribute__((used));
++MONO_TLS_STATIC MONO_KEYWORD_THREAD MonoJitTlsData     *mono_tls_jit_tls MONO_TLS_FAST __attribute__((used));
++MONO_TLS_STATIC MONO_KEYWORD_THREAD MonoDomain         *mono_tls_domain MONO_TLS_FAST __attribute__((used));
++MONO_TLS_STATIC MONO_KEYWORD_THREAD SgenThreadInfo     *mono_tls_sgen_thread_info MONO_TLS_FAST __attribute__((used));
++MONO_TLS_STATIC MONO_KEYWORD_THREAD MonoLMF           **mono_tls_lmf_addr MONO_TLS_FAST __attribute__((used));
+ 
+ #undef MONO_TLS_STATIC // no further uses
+ 
